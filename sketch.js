@@ -1,0 +1,66 @@
+ // Classifier Variable
+ let classifier;
+ // Model URL
+ let imageModelURL = 'https://teachablemachine.withgoogle.com/models/I0AViK8ov/';
+ 
+ // Video
+ let video;
+ let flippedVideo;
+ // To store the classification
+ let label = "";
+
+ // Load the model first
+ function preload() {
+   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+ }
+
+ function setup() {
+   createCanvas(500, 500);
+   // Create the video
+   video = createCapture(VIDEO);
+   video.size(320, 240);
+   video.hide();
+
+   flippedVideo = ml5.flipImage(video);
+   // Start classifying
+   classifyVideo();
+   rectMode(CENTER);
+ }
+
+ function draw() {
+   background(0);
+   image(flippedVideo, 0, 0, 200, 150);
+   // Draw the label
+   fill('red');
+   if(label == 'circle'){
+       circle(width/2, height/2, 100);
+   }
+   if(label == 'triangle'){
+       circle(triangle(250, 150, 337, 300, 163, 300));
+   }
+   if(label == 'rect'){
+       rect(width/2, height/2, 100, 100);
+   }
+ }
+
+ // Get a prediction for the current video frame
+ function classifyVideo() {
+   flippedVideo = ml5.flipImage(video)
+   classifier.classify(flippedVideo, gotResult);
+   flippedVideo.remove();
+
+ }
+
+ // When we get a result
+ function gotResult(error, results) {
+   // If there is an error
+   if (error) {
+     console.error(error);
+     return;
+   }
+   // The results are in an array ordered by confidence.
+   // console.log(results[0]);
+   label = results[0].label;
+   // Classifiy again!
+   classifyVideo();
+ }
